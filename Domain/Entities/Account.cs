@@ -6,6 +6,7 @@ namespace Domain.Entities
     {
         public int Id { get; set; }
         public decimal Cash { get; set; }
-        public IList<Issuer> Issuers { get; private set; } = new List<Issuer>();
+        // TODO: will be Issuer treat as a value object?
+        //public IList<Issuer> Issuers { get; private set; } = new List<Issuer>();
     }
 }
