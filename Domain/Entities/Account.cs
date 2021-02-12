@@ -6,6 +6,6 @@ namespace Domain.Entities
     {
         public int Id { get; set; }
         public decimal Cash { get; set; }
-        public IList<Issuer> Issuers { get; private set; } = new List<Issuer>();
+        public IList<Order> Orders { get; private set; } = new List<Order>();
     }
 }

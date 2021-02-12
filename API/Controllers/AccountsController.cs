@@ -11,7 +11,6 @@ namespace API.Controllers
         public async Task<ActionResult<Account>> Add([FromBody]CreateAccountCommand command)
         {
             return await Mediator.Send(command);
-        }
-       
+        }       
     }
 }

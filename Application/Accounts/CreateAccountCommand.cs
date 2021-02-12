@@ -3,9 +3,6 @@ using FluentValidation;
 using Infrastructure.Persistence;
 using MediatR;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -22,34 +19,34 @@ namespace Application.Accounts
         {
             RuleFor(x => x.Cash)
                 .NotEmpty()
-                .GreaterThan(0);            
+                .GreaterThan(0);
+        }
+    }
+
+    public class Handler : IRequestHandler<CreateAccountCommand, Account>
+    {
+        private readonly ApplicationDbContext _context;
+
+        public Handler(ApplicationDbContext context)
+        {
+            _context = context;
         }
 
-        public class Handler : IRequestHandler<CreateAccountCommand, Account>
+        public async Task<Account> Handle(CreateAccountCommand request, CancellationToken cancellationToken)
         {
-            private readonly ApplicationDbContext _context;
-
-            public Handler(ApplicationDbContext context)
+            var account = new Account
             {
-                _context = context;
-            }
+                Cash = request.Cash
+            };
 
-            public async Task<Account> Handle(CreateAccountCommand request, CancellationToken cancellationToken)
-            {
-                var account = new Account
-                {
-                    Cash = request.Cash
-                };
+            account = _context.Accounts.Add(account).Entity;
 
-                account = _context.Accounts.Add(account).Entity;
+            var success = await _context.SaveChangesAsync(cancellationToken) > 0;
 
-                 var success = await _context.SaveChangesAsync(cancellationToken) > 0;
+            if (success)
+                return account;
 
-                if(success)
-                    return account;
-
-                throw new Exception("There are a problem saving changes");
-            }
+            throw new Exception("There are a problem saving changes");
         }
     }
 }

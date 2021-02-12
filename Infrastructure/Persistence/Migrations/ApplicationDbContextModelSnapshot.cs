@@ -29,7 +29,7 @@ namespace Infrastructure.Persistence.Migrations
                     b.ToTable("Accounts");
                 });
 
-            modelBuilder.Entity("Domain.Entities.Issuer", b =>
+            modelBuilder.Entity("Domain.Entities.Order", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -38,11 +38,17 @@ namespace Infrastructure.Persistence.Migrations
                     b.Property<int>("AccountId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("Name")
+                    b.Property<string>("IssuerName")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Operation")
                         .HasColumnType("TEXT");
 
                     b.Property<decimal>("SharePrice")
                         .HasColumnType("TEXT");
+
+                    b.Property<long>("TimeStamp")
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("TotalShares")
                         .HasColumnType("INTEGER");
@@ -51,13 +57,13 @@ namespace Infrastructure.Persistence.Migrations
 
                     b.HasIndex("AccountId");
 
-                    b.ToTable("Issuers");
+                    b.ToTable("Orders");
                 });
 
-            modelBuilder.Entity("Domain.Entities.Issuer", b =>
+            modelBuilder.Entity("Domain.Entities.Order", b =>
                 {
                     b.HasOne("Domain.Entities.Account", "Account")
-                        .WithMany("Issuers")
+                        .WithMany("Orders")
                         .HasForeignKey("AccountId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -67,7 +73,7 @@ namespace Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("Domain.Entities.Account", b =>
                 {
-                    b.Navigation("Issuers");
+                    b.Navigation("Orders");
                 });
 #pragma warning restore 612, 618
         }

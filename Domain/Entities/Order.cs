@@ -2,10 +2,13 @@
 {
     public class Order
     {
-        public int TimeStamp { get; set; }
+        public int Id { get; set; }      
         public int AccountId { get; set; }
         public Account Account { get; set; }
+        public long TimeStamp { get; set; }
         public string Operation { get; set; }
-        public Issuer Issuer { get; set; }
+        public string IssuerName { get; set; }
+        public int TotalShares { get; set; }
+        public decimal SharePrice { get; set; }
     }
 }
