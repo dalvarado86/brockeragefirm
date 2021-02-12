@@ -1,8 +1,10 @@
-﻿using Domain.Entities;
+﻿using Application.Exceptions;
+using Domain.Entities;
 using FluentValidation;
 using Infrastructure.Persistence;
 using MediatR;
 using System;
+using System.Net;
 using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
@@ -56,7 +58,7 @@ namespace Application.Orders
             var account = await _context.Accounts.FindAsync(request.AccountId);
 
             if (account == null)
-                throw new Exception("Account not found");
+                throw new RestException(HttpStatusCode.NotFound, new { account = "Not found" });
 
             var order = new Order
             {
