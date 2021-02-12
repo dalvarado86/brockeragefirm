@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using FluentValidation.AspNetCore;
 
 namespace API
 {
@@ -27,8 +28,8 @@ namespace API
             // Adding Infrastructure services
             services.AddInfrastructure(Configuration);
 
-            // Adding open api support
-            services.AddControllers();
+            services.AddControllers()
+                .AddFluentValidation();
 
             // Adding open api support
             services.AddSwaggerGen(c =>
