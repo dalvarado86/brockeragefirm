@@ -12,6 +12,7 @@ namespace Infrastructure.Persistence
         }
 
         public DbSet<Account> Accounts { get; set; }
+        public DbSet<Issuer> Issuers { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
