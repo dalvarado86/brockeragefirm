@@ -1,9 +1,9 @@
 ﻿using Application.Exceptions;
+using Application.Interfaces;
 using Application.Validators;
 using AutoMapper;
 using Domain.Entities;
 using FluentValidation;
-using Infrastructure.Persistence;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -55,10 +55,10 @@ namespace Application.Orders
 
     public class Handler : IRequestHandler<CreateOrderCommand, OrderResult>
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IApplicationDbContext _context;
         private readonly IMapper _mapper;
 
-        public Handler(ApplicationDbContext context, IMapper mapper)
+        public Handler(IApplicationDbContext context, IMapper mapper)
         {
             _mapper = mapper;
             _context = context;

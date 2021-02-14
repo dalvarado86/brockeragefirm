@@ -1,9 +1,7 @@
-﻿using Application.Orders;
+﻿using Application.Interfaces;
 using Domain.Entities;
 using FluentValidation;
-using Infrastructure.Persistence;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -28,9 +26,9 @@ namespace Application.Accounts
 
     public class Handler : IRequestHandler<CreateAccountCommand, AccountResult>
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IApplicationDbContext _context;
 
-        public Handler(ApplicationDbContext context)
+        public Handler(IApplicationDbContext context)
         {
             _context = context;
         }
