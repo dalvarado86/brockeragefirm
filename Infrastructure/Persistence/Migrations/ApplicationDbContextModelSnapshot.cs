@@ -96,7 +96,7 @@ namespace Infrastructure.Persistence.Migrations
             modelBuilder.Entity("Domain.Entities.Stock", b =>
                 {
                     b.HasOne("Domain.Entities.Account", "Account")
-                        .WithMany()
+                        .WithMany("Stocks")
                         .HasForeignKey("AccountId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -107,6 +107,8 @@ namespace Infrastructure.Persistence.Migrations
             modelBuilder.Entity("Domain.Entities.Account", b =>
                 {
                     b.Navigation("Orders");
+
+                    b.Navigation("Stocks");
                 });
 #pragma warning restore 612, 618
         }

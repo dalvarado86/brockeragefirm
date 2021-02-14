@@ -5,6 +5,7 @@ using System.Linq;
 
 namespace Application.Validators
 {
+    // TODO: Optimize/Refactorize Business Rules Validations
     public static class BusinessValidator
     {
         private static readonly TimeSpan TimeStart = new TimeSpan(6, 0, 0);
@@ -14,16 +15,18 @@ namespace Application.Validators
         {
             var businessErrors = new List<string>();
             
-            if(string.Equals(order.Operation, "BUY"))
+            switch(order.Operation)
             {
-                if (!SufficentFunds(account, order))
-                    businessErrors.Add("INSUFFICENT_BALANCE");
-            }
-
-            if (string.Equals(order.Operation, "SELL"))
-            {
-                if (!SufficentStocks(account, order))
-                    businessErrors.Add("INSUFFICENT_STOCKS");
+                case "BUY":
+                    if (!SufficentFunds(account, order))
+                        businessErrors.Add("INSUFFICIENT_BALANCE");
+                    break;
+                case "SELL":
+                    if (!SufficentStocks(account, order))
+                        businessErrors.Add("INSUFFICIENT_STOCKS");
+                    break;
+                default: businessErrors.Add("INVALID_OPERATION");
+                    break;
             }
 
             var duplicated = account.Orders
@@ -33,8 +36,8 @@ namespace Application.Validators
             if (duplicated)
                 businessErrors.Add("DUPLICATED_OPERATION");
 
-            if (!MarketIsOpen(TimeStart, TimeEnd))
-                businessErrors.Add("CLOSED_MARKET");
+            //if (!MarketIsOpen(TimeStart, TimeEnd))
+            //    businessErrors.Add("CLOSED_MARKET");
 
             // TODO: Add Any other invalid operation
 
@@ -42,7 +45,7 @@ namespace Application.Validators
         }
 
         // TODO: Set as configuration params
-        private static bool MarketIsOpen(TimeSpan timeStart, TimeSpan timeEnd)
+        public static bool MarketIsOpen(TimeSpan timeStart, TimeSpan timeEnd)
         {
             TimeSpan now = DateTime.Now.TimeOfDay;
             return now < timeStart && now > timeEnd;
@@ -69,16 +72,14 @@ namespace Application.Validators
 
         public static bool SufficentStocks(Account account, Order order)
         {
-            //TODO: Create a Stock entity and persistence
-            var currentQtyIssuers = account.Orders
+            var currentStock = account.Stocks
                 .Where(x => x.IssuerName == order.IssuerName)
-                .ToList().Count;
+                .SingleOrDefault();
 
-            // Check insufficent stock
-            if (currentQtyIssuers < order.TotalShares)
+            if (currentStock == null)
                 return false;
-
-            return true;
+            else
+                return !(currentStock.Quantity < order.TotalShares);
         }
     }
 }

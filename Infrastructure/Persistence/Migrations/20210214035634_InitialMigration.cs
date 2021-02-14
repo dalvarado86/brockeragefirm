@@ -2,12 +2,22 @@
 
 namespace Infrastructure.Persistence.Migrations
 {
-    public partial class AddOrder : Migration
+    public partial class InitialMigration : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "Issuers");
+            migrationBuilder.CreateTable(
+                name: "Accounts",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Cash = table.Column<decimal>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Accounts", x => x.Id);
+                });
 
             migrationBuilder.CreateTable(
                 name: "Orders",
@@ -33,9 +43,35 @@ namespace Infrastructure.Persistence.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "Stocks",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    AccountId = table.Column<int>(type: "INTEGER", nullable: false),
+                    IssuerName = table.Column<string>(type: "TEXT", nullable: true),
+                    Quantity = table.Column<int>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Stocks", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Stocks_Accounts_AccountId",
+                        column: x => x.AccountId,
+                        principalTable: "Accounts",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_Orders_AccountId",
                 table: "Orders",
+                column: "AccountId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Stocks_AccountId",
+                table: "Stocks",
                 column: "AccountId");
         }
 
@@ -44,32 +80,11 @@ namespace Infrastructure.Persistence.Migrations
             migrationBuilder.DropTable(
                 name: "Orders");
 
-            migrationBuilder.CreateTable(
-                name: "Issuers",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    AccountId = table.Column<int>(type: "INTEGER", nullable: false),
-                    Name = table.Column<string>(type: "TEXT", nullable: true),
-                    SharePrice = table.Column<decimal>(type: "TEXT", nullable: false),
-                    TotalShares = table.Column<int>(type: "INTEGER", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Issuers", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Issuers_Accounts_AccountId",
-                        column: x => x.AccountId,
-                        principalTable: "Accounts",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
+            migrationBuilder.DropTable(
+                name: "Stocks");
 
-            migrationBuilder.CreateIndex(
-                name: "IX_Issuers_AccountId",
-                table: "Issuers",
-                column: "AccountId");
+            migrationBuilder.DropTable(
+                name: "Accounts");
         }
     }
 }

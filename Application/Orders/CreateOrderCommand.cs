@@ -8,6 +8,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Text.Json.Serialization;
 using System.Threading;
@@ -37,8 +38,8 @@ namespace Application.Orders
         public CommandValidator()
         {
             RuleFor(x => x.Operation)
-                .NotEmpty()
-                .In("BUY", "SELL");
+                .NotEmpty();
+            //.In("BUY", "SELL");
 
             RuleFor(x => x.IssuerName).NotEmpty();
 
@@ -68,25 +69,29 @@ namespace Application.Orders
             var businessErrors = new List<string>();
             var issuers = new List<IssuerDto>();
 
+            // Getting the account
             var account = await _context.Accounts
                 .Include(x => x.Orders)
-                .FirstOrDefaultAsync(x => x.Id == request.AccountId, cancellationToken: cancellationToken);
+                .Include(x => x.Stocks)
+                .FirstOrDefaultAsync(x => x.Id == request.AccountId);            
 
             if (account == null)
-                throw new RestException(HttpStatusCode.NotFound, new { account = "Not found" });
+                throw new RestException(HttpStatusCode.NotFound, new { Account = "Not found" });
            
             var order = new Order
             {
                 AccountId = request.AccountId,
                 TimeStamp = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds(),
                 Operation = request.Operation,
-                IssuerName = request.IssuerName,
+                IssuerName = request.IssuerName.Trim(),
                 TotalShares = request.TotalShares,
                 SharePrice = request.SharePrice
             };
 
+            // Calculating the operation total amount 
             var grandTotal = request.SharePrice * request.TotalShares;
 
+            // Validating business rules
             businessErrors = BusinessValidator.Validate(account, order);
                           
             if (businessErrors.Count == 0)
@@ -94,11 +99,36 @@ namespace Application.Orders
                 // Adding order
                 _context.Orders.Add(order);
 
-                // Updating balance
+                // Getting the specific stock from the account
+                var stock = account.Stocks
+                    .Where(x => x.IssuerName == order.IssuerName)
+                    .SingleOrDefault();
+
+                if (stock != null)
+                {
+                    // Updating the current stock
+                    stock.Quantity = string.Equals(request.Operation, "BUY") ?
+                        stock.Quantity += request.TotalShares : // Adding to the stock if is buy
+                        stock.Quantity -= request.TotalShares;  // Removing to the stock if is sell
+                }
+                else
+                {
+                    stock = new Stock
+                    {
+                        AccountId = request.AccountId,
+                        IssuerName = request.IssuerName,
+                        Quantity = request.TotalShares
+                    };
+
+                    _context.Stocks.Add(stock); // Creating new element in the account's stock
+                }
+              
+                // Updating account's balance
                 account.Cash = string.Equals(request.Operation, "SELL") ?
                                    account.Cash += grandTotal :
                                            account.Cash -= grandTotal;
                
+                // Saving changes
                 var success = await _context.SaveChangesAsync(cancellationToken) > 0;
 
                 // Mapping issuers
