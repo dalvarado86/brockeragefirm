@@ -1,9 +1,13 @@
 ﻿using Application.Exceptions;
+using Application.Validators;
 using Domain.Entities;
 using FluentValidation;
 using Infrastructure.Persistence;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Text.Json.Serialization;
 using System.Threading;
@@ -11,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace Application.Orders
 {
-    public class CreateOrderCommand : IRequest
+    public class CreateOrderCommand : IRequest<OrderResult>
     {
         [JsonIgnore]
         public int AccountId { get; set; }
@@ -28,7 +32,27 @@ namespace Application.Orders
         public decimal SharePrice { get; set; }
     }
 
-    public class Handler : IRequestHandler<CreateOrderCommand>
+    public class CommandValidator : AbstractValidator<CreateOrderCommand>
+    {
+        public CommandValidator()
+        {
+            RuleFor(x => x.Operation)
+                .NotEmpty()
+                .In("BUY", "SELL");
+
+            RuleFor(x => x.IssuerName).NotEmpty();
+
+            RuleFor(x => x.TotalShares)
+                .NotEmpty()
+                .GreaterThan(0);
+
+            RuleFor(x => x.SharePrice)
+               .NotEmpty()
+               .GreaterThan(0);
+        }
+    }
+
+    public class Handler : IRequestHandler<CreateOrderCommand, OrderResult>
     {
         private readonly ApplicationDbContext _context;
 
@@ -37,29 +61,17 @@ namespace Application.Orders
             _context = context;
         }
 
-        public class CommandValidator : AbstractValidator<CreateOrderCommand>
+        public async Task<OrderResult> Handle(CreateOrderCommand request, CancellationToken cancellationToken)
         {
-            public CommandValidator()
-            {
-                //RuleFor(x => x.AccountId).NotEmpty();
-                RuleFor(x => x.Operation).NotEmpty();
-                RuleFor(x => x.IssuerName).NotEmpty();
-                RuleFor(x => x.TotalShares)
-                    .NotEmpty()
-                    .GreaterThan(0);
-                RuleFor(x => x.SharePrice)
-                   .NotEmpty()
-                   .GreaterThan(0);
-            }
-        }
+            var businessErrors = new List<string>();
 
-        public async Task<Unit> Handle(CreateOrderCommand request, CancellationToken cancellationToken)
-        {            
-            var account = await _context.Accounts.FindAsync(request.AccountId);
+            var account = await _context.Accounts
+                .Include(x => x.Orders)
+                .FirstOrDefaultAsync(x => x.Id == request.AccountId);
 
             if (account == null)
                 throw new RestException(HttpStatusCode.NotFound, new { account = "Not found" });
-
+           
             var order = new Order
             {
                 AccountId = request.AccountId,
@@ -70,14 +82,37 @@ namespace Application.Orders
                 SharePrice = request.SharePrice
             };
 
-            _context.Orders.Add(order);
+            var grandTotal = request.SharePrice * request.TotalShares;
 
-            var success = await _context.SaveChangesAsync(cancellationToken) > 0;
 
-            if (success)
-                return Unit.Value;
+            businessErrors = BusinessValidator.Validate(account, order);
+              
+            
+            if (businessErrors.Count == 0)
+            {
+                // Adding order
+                _context.Orders.Add(order);
 
-            throw new Exception("Problem saving changes");
-        }
+                // Updating balance
+                account.Cash = string.Equals(request.Operation, "SELL") ?
+                                   account.Cash += grandTotal :
+                                           account.Cash -= grandTotal;
+               
+                var success = await _context.SaveChangesAsync(cancellationToken) > 0;
+
+                if (!success)
+                    throw new Exception("Problem saving changes");
+            }
+
+            return new OrderResult
+            {
+                CurrentBalance = new CurrentBalance
+                {
+                    Cash = account.Cash,
+                    Issuers = new List<Issuers>() //TODO: Mapping from Orders
+                },
+                BusinessErrors = businessErrors
+            };
+        }       
     }
 }

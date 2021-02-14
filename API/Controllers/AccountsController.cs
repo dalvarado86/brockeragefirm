@@ -15,7 +15,7 @@ namespace API.Controllers
         } 
         
         [HttpPost("{id}/orders")]
-        public async Task<ActionResult<MediatR.Unit>> SendOrder(int id, CreateOrderCommand command)
+        public async Task<ActionResult<OrderResult>> SendOrder(int id, CreateOrderCommand command)
         {
             if (id < 0)
                 return BadRequest(new { id = "AccountId must not be empty." });
