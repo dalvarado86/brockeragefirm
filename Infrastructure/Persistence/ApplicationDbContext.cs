@@ -13,6 +13,7 @@ namespace Infrastructure.Persistence
 
         public DbSet<Account> Accounts { get; set; }
         public DbSet<Order> Orders { get; set; }
+        public DbSet<Stock> Stocks { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
