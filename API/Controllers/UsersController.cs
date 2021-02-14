@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace API.Controllers
 {
-    public class UserController : ApiControllerBase
+    public class UsersController : ApiControllerBase
     {
         [AllowAnonymous]
         [HttpPost("login")]
