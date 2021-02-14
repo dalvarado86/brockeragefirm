@@ -1,5 +1,6 @@
 ﻿using Application.Exceptions;
 using Application.Validators;
+using AutoMapper;
 using Domain.Entities;
 using FluentValidation;
 using Infrastructure.Persistence;
@@ -7,7 +8,6 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Text.Json.Serialization;
 using System.Threading;
@@ -55,19 +55,22 @@ namespace Application.Orders
     public class Handler : IRequestHandler<CreateOrderCommand, OrderResult>
     {
         private readonly ApplicationDbContext _context;
+        private readonly IMapper _mapper;
 
-        public Handler(ApplicationDbContext context)
+        public Handler(ApplicationDbContext context, IMapper mapper)
         {
+            _mapper = mapper;
             _context = context;
         }
 
         public async Task<OrderResult> Handle(CreateOrderCommand request, CancellationToken cancellationToken)
         {
             var businessErrors = new List<string>();
+            var issuers = new List<IssuerDto>();
 
             var account = await _context.Accounts
                 .Include(x => x.Orders)
-                .FirstOrDefaultAsync(x => x.Id == request.AccountId);
+                .FirstOrDefaultAsync(x => x.Id == request.AccountId, cancellationToken: cancellationToken);
 
             if (account == null)
                 throw new RestException(HttpStatusCode.NotFound, new { account = "Not found" });
@@ -84,10 +87,8 @@ namespace Application.Orders
 
             var grandTotal = request.SharePrice * request.TotalShares;
 
-
             businessErrors = BusinessValidator.Validate(account, order);
-              
-            
+                          
             if (businessErrors.Count == 0)
             {
                 // Adding order
@@ -100,8 +101,12 @@ namespace Application.Orders
                
                 var success = await _context.SaveChangesAsync(cancellationToken) > 0;
 
+                // Mapping issuers
+                foreach (var orders in account.Orders)
+                    issuers.Add(_mapper.Map<Order, IssuerDto>(orders));
+
                 if (!success)
-                    throw new Exception("Problem saving changes");
+                    throw new Exception("Problem saving changes");                
             }
 
             return new OrderResult
@@ -109,7 +114,7 @@ namespace Application.Orders
                 CurrentBalance = new CurrentBalance
                 {
                     Cash = account.Cash,
-                    Issuers = new List<Issuers>() //TODO: Mapping from Orders
+                    Issuers = issuers
                 },
                 BusinessErrors = businessErrors
             };

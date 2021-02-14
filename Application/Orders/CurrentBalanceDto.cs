@@ -17,10 +17,10 @@ namespace Application.Orders
     public class CurrentBalance
     {
         public decimal Cash { get; set; }
-        public IList<Issuers> Issuers { get; set; } = new List<Issuers>();        
+        public IList<IssuerDto> Issuers { get; set; } = new List<IssuerDto>();        
     }
 
-    public class Issuers
+    public class IssuerDto
     {
         [JsonPropertyName("issuer_name")]
         public string IssuerName { get; set; }
