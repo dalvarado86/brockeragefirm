@@ -10,6 +10,9 @@ using FluentValidation.AspNetCore;
 using API.Middleware;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Authorization;
+using System.Linq;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace API
 {
@@ -40,7 +43,31 @@ namespace API
             // Adding open api support
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "API", Version = "v1" });
+                var securityScheme = new OpenApiSecurityScheme
+                {
+                    Name = "JWT Authentication",
+                    Description = "Type into the textbox: Bearer {your JWT token}.",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.Http,
+                    Scheme = "bearer",
+                    BearerFormat = "JWT",
+                    Reference = new OpenApiReference
+                    {
+                        Id = JwtBearerDefaults.AuthenticationScheme,
+                        Type = ReferenceType.SecurityScheme
+                    }
+                };
+
+                c.AddSecurityDefinition(securityScheme.Reference.Id, securityScheme);
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    { securityScheme, new string[] { } }
+                });
+
+                c.SwaggerDoc("v1", new OpenApiInfo { 
+                    Title = "Brockerage API Challenge", 
+                    Version = "v1"                                     
+                });                
             });
         }
 
@@ -49,6 +76,8 @@ namespace API
         {
             // Using an ErrorHandlingMiddleware instead of Exception Page in Development and Production environments
             app.UseMiddleware<ErrorHandlingMiddleware>();
+
+            //JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 
             if (env.IsDevelopment())
             {
