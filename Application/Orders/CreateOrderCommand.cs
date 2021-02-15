@@ -2,6 +2,7 @@
 using Application.Common.Interfaces;
 using Application.Common.Models;
 using Application.Common.Validators;
+using Application.Orders.Models;
 using AutoMapper;
 using Domain.Entities;
 using FluentValidation;
@@ -41,9 +42,9 @@ namespace Application.Orders
         {
             RuleFor(x => x.Operation)
                 .NotEmpty();
-            //.In("BUY", "SELL");
 
-            RuleFor(x => x.IssuerName).NotEmpty();
+            RuleFor(x => x.IssuerName)
+                .NotEmpty();
 
             RuleFor(x => x.TotalShares)
                 .NotEmpty()
@@ -141,7 +142,7 @@ namespace Application.Orders
 
             return new OrderResult
             {
-                CurrentBalance = new CurrentBalance
+                CurrentBalance = new CurrentBalanceDto
                 {
                     Cash = account.Cash,
                     Issuers = _mapper.Map<List<Order>, List<IssuerDto>>((List<Order>)account.Orders)

@@ -1,5 +1,5 @@
-﻿using Application.Accounts;
-using Application.Orders;
+﻿using Application.Accounts.Models;
+using Application.Orders.Models;
 using AutoMapper;
 using Domain.Entities;
 

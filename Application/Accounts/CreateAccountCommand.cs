@@ -1,10 +1,10 @@
-﻿using Application.Common.Interfaces;
+﻿using Application.Accounts.Models;
+using Application.Common.Interfaces;
 using Domain.Entities;
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -61,12 +61,5 @@ namespace Application.Accounts
 
             throw new Exception("There are a problem saving changes");
         }
-    }
-
-    public class AccountResult
-    {
-        public int Id { get; set; }
-        public decimal Cash { get; set; }
-        public IList<string> Issuers { get; private set; } = new List<string>();
     }
 }
