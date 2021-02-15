@@ -2,6 +2,7 @@
 using Domain.Entities;
 using FluentValidation;
 using MediatR;
+using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -27,21 +28,27 @@ namespace Application.Accounts
     public class Handler : IRequestHandler<CreateAccountCommand, AccountResult>
     {
         private readonly IApplicationDbContext _context;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IUserAccessor _userAccessor;
 
-        public Handler(IApplicationDbContext context)
+        public Handler(IApplicationDbContext context, UserManager<ApplicationUser> userManager, IUserAccessor userAccessor)
         {
             _context = context;
+            _userManager = userManager;
+            _userAccessor = userAccessor;
         }
 
         public async Task<AccountResult> Handle(CreateAccountCommand request, CancellationToken cancellationToken)
         {
+            var user = await _userManager.FindByNameAsync(_userAccessor.GetCurrentUsername());
+
             var account = new Account
             {
-                Cash = request.Cash
-            };
+                Cash = request.Cash,
+                User = user
+            };         
 
-            account = _context.Accounts
-                .Add(account).Entity;
+            account = _context.Accounts.Add(account).Entity;
 
             var success = await _context.SaveChangesAsync(cancellationToken) > 0;
 

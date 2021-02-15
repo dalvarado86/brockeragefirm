@@ -2,7 +2,9 @@
 using Domain.Entities;
 using Infrastructure.Identity;
 using Infrastructure.Persistence;
+using Infrastructure.Security;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -29,8 +31,17 @@ namespace Infrastructure
             var identiyBuilder = new IdentityBuilder(builder.UserType, builder.Services);
             identiyBuilder.AddEntityFrameworkStores<ApplicationDbContext>();
             identiyBuilder.AddSignInManager<SignInManager<ApplicationUser>>();
+           
+            services.AddAuthorization(options =>
+            {
+                // Adding a security policy: Only the account holder can sell/buy for his/her own account.
+                options.AddPolicy("IsAccountHolder", policy =>
+                {
+                    policy.Requirements.Add(new IsAccountHolderRequeriment());
+                });
+            });
 
-            services.AddAuthorization();
+            services.AddTransient<IAuthorizationHandler, IsAccountHolderRequerimentHandler>();
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>

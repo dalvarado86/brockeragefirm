@@ -1,5 +1,6 @@
 ﻿using Application.Accounts;
 using Application.Orders;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 
@@ -14,6 +15,7 @@ namespace API.Controllers
         } 
         
         [HttpPost("{id}/orders")]
+        [Authorize(Policy = "IsAccountHolder")]
         public async Task<ActionResult<OrderResult>> SendOrder(int id, CreateOrderCommand command)
         {
             if (id < 0)
