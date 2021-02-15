@@ -131,10 +131,6 @@ namespace Application.Orders
                 // Saving changes
                 var success = await _context.SaveChangesAsync(cancellationToken) > 0;
 
-                // Mapping issuers
-                foreach (var orders in account.Orders)
-                    issuers.Add(_mapper.Map<Order, IssuerDto>(orders));
-
                 if (!success)
                     throw new Exception("Problem saving changes");                
             }
@@ -144,7 +140,7 @@ namespace Application.Orders
                 CurrentBalance = new CurrentBalance
                 {
                     Cash = account.Cash,
-                    Issuers = issuers
+                    Issuers = _mapper.Map<List<Order>, List<IssuerDto>>((List<Order>)account.Orders)
                 },
                 BusinessErrors = businessErrors
             };

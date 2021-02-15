@@ -24,5 +24,12 @@ namespace API.Controllers
             command.AccountId = id;
             return await Mediator.Send(command);
         }
+
+        [HttpGet("{id}")]
+        [Authorize(Policy = "IsAccountHolder")]
+        public async Task<ActionResult<AccountDetailsDto>> Detail(int id)
+        {            
+            return await Mediator.Send(new GetAccountDetailsQuery { AccountId = id });
+        }
     }
 }
