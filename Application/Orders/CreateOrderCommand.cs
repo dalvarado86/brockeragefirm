@@ -1,11 +1,13 @@
 ﻿using Application.Common.Exceptions;
 using Application.Common.Interfaces;
+using Application.Common.Models;
 using Application.Common.Validators;
 using AutoMapper;
 using Domain.Entities;
 using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -57,11 +59,13 @@ namespace Application.Orders
     {
         private readonly IApplicationDbContext _context;
         private readonly IMapper _mapper;
+        private readonly IOptions<MarketSettings> _marketSettings;
 
-        public Handler(IApplicationDbContext context, IMapper mapper)
+        public Handler(IApplicationDbContext context, IMapper mapper, IOptions<MarketSettings> marketSettings)
         {
             _mapper = mapper;
             _context = context;
+            _marketSettings = marketSettings;
         }
 
         public async Task<OrderResult> Handle(CreateOrderCommand request, CancellationToken cancellationToken)
@@ -92,7 +96,7 @@ namespace Application.Orders
             var grandTotal = request.SharePrice * request.TotalShares;
 
             // Validating business rules
-            businessErrors = BusinessValidator.Validate(account, order);
+            businessErrors = Validations(account, order);
                           
             if (businessErrors.Count == 0)
             {
@@ -144,6 +148,34 @@ namespace Application.Orders
                 },
                 BusinessErrors = businessErrors
             };
-        }       
+        }
+
+        private List<string> Validations(Account account, Order order)
+        {
+            var errors = new List<string>();
+
+            switch (order.Operation)
+            {
+                case "BUY":
+                    if (!BusinessRulesValidator.SufficentFunds(account, order))
+                        errors.Add("INSUFFICIENT_BALANCE");
+                    break;
+                case "SELL":
+                    if (!BusinessRulesValidator.SufficentStocks(account, order))
+                        errors.Add("INSUFFICIENT_STOCKS");
+                    break;
+                default:
+                    errors.Add("INVALID_OPERATION");
+                    break;
+            }
+         
+            if (BusinessRulesValidator.Duplicated(account, order))
+                errors.Add("DUPLICATED_OPERATION");
+
+            if (!BusinessRulesValidator.MarketIsOpen(_marketSettings.Value.TimeOpen, _marketSettings.Value.TimeClose))
+                errors.Add("CLOSED_MARKET");
+
+            return errors;
+        }
     }
 }

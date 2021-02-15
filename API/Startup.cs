@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Mvc.Authorization;
 using System.Linq;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.IdentityModel.Tokens.Jwt;
+using System;
 
 namespace API
 {
@@ -29,7 +30,7 @@ namespace API
         public void ConfigureServices(IServiceCollection services)
         {
             // Adding Application services
-            services.AddApplication();
+            services.AddApplication(Configuration);
 
             // Adding Infrastructure services
             services.AddInfrastructure(Configuration);
@@ -61,7 +62,7 @@ namespace API
                 c.AddSecurityDefinition(securityScheme.Reference.Id, securityScheme);
                 c.AddSecurityRequirement(new OpenApiSecurityRequirement
                 {
-                    { securityScheme, new string[] { } }
+                    { securityScheme, Array.Empty<string>() }
                 });
 
                 c.SwaggerDoc("v1", new OpenApiInfo { 
