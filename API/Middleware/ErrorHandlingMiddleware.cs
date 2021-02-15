@@ -1,4 +1,4 @@
-﻿using Application.Exceptions;
+﻿using Application.Common.Exceptions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using System;
@@ -31,7 +31,7 @@ namespace API.Middleware
             }
         }
 
-        private async Task HandleExceptionAsync(HttpContext context, Exception ex, ILogger<ErrorHandlingMiddleware> logger)
+        private static async Task HandleExceptionAsync(HttpContext context, Exception ex, ILogger<ErrorHandlingMiddleware> logger)
         {
             object errors = null;
 

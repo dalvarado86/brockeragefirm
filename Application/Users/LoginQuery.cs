@@ -1,5 +1,5 @@
-﻿using Application.Exceptions;
-using Application.Interfaces;
+﻿using Application.Common.Exceptions;
+using Application.Common.Interfaces;
 using Domain.Entities;
 using FluentValidation;
 using MediatR;

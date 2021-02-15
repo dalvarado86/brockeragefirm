@@ -2,7 +2,7 @@
 using System;
 using System.Linq;
 
-namespace Application.Validators
+namespace Application.Common.Validators
 {
     public static class ValidatorExtensions
     {

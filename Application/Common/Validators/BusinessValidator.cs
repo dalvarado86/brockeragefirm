@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Application.Validators
+namespace Application.Common.Validators
 {
     // TODO: Optimize/Refactorize Business Rules Validations
     public static class BusinessValidator

@@ -1,6 +1,6 @@
-﻿using Application.Exceptions;
-using Application.Interfaces;
-using Application.Validators;
+﻿using Application.Common.Exceptions;
+using Application.Common.Interfaces;
+using Application.Common.Validators;
 using AutoMapper;
 using Domain.Entities;
 using FluentValidation;

@@ -1,6 +1,6 @@
-﻿using Application.Exceptions;
-using Application.Interfaces;
-using Application.Validators;
+﻿using Application.Common.Exceptions;
+using Application.Common.Interfaces;
+using Application.Common.Validators;
 using Domain.Entities;
 using FluentValidation;
 using MediatR;
@@ -31,15 +31,13 @@ namespace Application.Users
 
     public class RegisterUserHandler : IRequestHandler<RegisterUserCommand, UserResult>
     {
-        private readonly IApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IJwtGenerator _jwtGenerator;
 
-        public RegisterUserHandler(IApplicationDbContext context, UserManager<ApplicationUser> userManager, IJwtGenerator jwtGenerator)
+        public RegisterUserHandler(UserManager<ApplicationUser> userManager, IJwtGenerator jwtGenerator)
         {
             _jwtGenerator = jwtGenerator;
             _userManager = userManager;
-            _context = context;
         }
 
         public async Task<UserResult> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
