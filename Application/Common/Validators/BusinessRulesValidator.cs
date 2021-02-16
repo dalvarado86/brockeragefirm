@@ -22,8 +22,9 @@ namespace Application.Common.Validators
         {
             return account.Orders
                 .Any(x => x.IssuerName == order.IssuerName &&
-                            x.SharePrice == order.SharePrice &&
-                                 GetDiferenceInMinutes(x.TimeStamp, order.TimeStamp) <= 5);
+                            x.Operation == order.Operation &&
+                                x.SharePrice == order.SharePrice &&
+                                     GetDiferenceInMinutes(x.TimeStamp, order.TimeStamp) <= 5);
         }
 
         public static bool MarketIsOpen(TimeSpan timeStart, TimeSpan timeEnd)
