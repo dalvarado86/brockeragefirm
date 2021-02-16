@@ -11,24 +11,24 @@ A backend challenge (GBM Software Engineer Challenge)
 ## Getting Started
 1. Install the latest [.NET 5 SDK](https://dotnet.microsoft.com/download/dotnet/5.0)
 2. Add SQLite extension in VS Code or SQLite/SQL Server Compact Toolbox in Visual Studio 2019 Community, to explore the database if you want.
-3. Navigate to `src/Api` and run `dotnet run` to launch the API (ASP .NET Core Web API)
+3. Navigate to `API` and run `dotnet run` to launch the API (ASP .NET Core Web API)
 
 ### Database Configuration
 
 The solution is configured to use Sqlite by default.
-Verify the **UseSQLiteConnection** connextion string within **appsettings.json** points to a valid Sqlite instance. Also you can use SQL Server changing **UseSQLite** variable to *false*.
+Verify the **UseSQLiteConnection** connection string within **appsettings.json** points to a valid Sqlite instance. Also you can use SQL Server changing **UseSQLite** variable to *false*.
 
 ### Database Migration
 
-To use `dotnet-ef` for your migrations add the following flags to your command (values assume you are executing from repository root)
+To use `dotnet-ef` for your migrations add the following flags to your command (values assume you are executing from the root folder)
 
-* `--project Infrastructure/` (optional if in this folder)
+* `--project Infrastructure/`
 * `--startup-project API/`
 * `--output-dir Persistence/Migrations`
 
 For example, to add a new migration from the root folder:
 
- `dotnet ef migrations add "MyMigration" --project Infrastructure/ --startup-project API/ --output-dir Persistence\Migrations`
+ `dotnet ef migrations add "MyMigration" --project Infrastructure/ --startup-project API/ --output-dir Persistence/Migrations`
 
  Then, you need update de database from the startup project (API)
  
