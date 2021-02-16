@@ -16,19 +16,23 @@ A backend challenge (GBM Software Engineer Challenge)
 ### Database Configuration
 
 The solution is configured to use Sqlite by default.
-Verify the **DefaultConnection** connextion string within **appsettings.json** points to a valid Sqlite instance.
+Verify the **UseSQLiteConnection** connextion string within **appsettings.json** points to a valid Sqlite instance. Also you can use SQL Server changing **UseSQLite** variable to *false*.
 
 ### Database Migration
 
 To use `dotnet-ef` for your migrations add the following flags to your command (values assume you are executing from repository root)
 
-* `--project src/Infrastructure` (optional if in this folder)
-* `--startup-project src/API`
+* `--project Infrastructure/` (optional if in this folder)
+* `--startup-project API/`
 * `--output-dir Persistence/Migrations`
 
 For example, to add a new migration from the root folder:
 
- `dotnet ef migrations add "MyMigration" --project src\Infrastructure --startup-project src\API --output-dir Persistence\Migrations`
+ `dotnet ef migrations add "MyMigration" --project Infrastructure/ --startup-project API/ --output-dir Persistence\Migrations`
+
+ Then, you need update de database from the startup project (API)
+ 
+ `dotnet ef database update`
 
 Also, when the application is run for the first time it builds an automatic migration populating 2 test users:
 * **Email**: jose@test.com, **Password**: Pa$$w0rd1
