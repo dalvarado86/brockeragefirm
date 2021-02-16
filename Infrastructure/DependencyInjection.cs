@@ -18,11 +18,23 @@ namespace Infrastructure
     {
         public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
         {
-            // Adding (sqlite) DbContext service
-            services.AddDbContext<ApplicationDbContext>(options =>
+            if (configuration.GetValue<bool>("UseSQLite"))
             {
-                options.UseSqlite(configuration.GetConnectionString("DefaultConnection"));      
-            });
+                // Adding SQLite DbContext service
+                services.AddDbContext<ApplicationDbContext>(options =>
+                {
+                    options.UseSqlite(configuration.GetConnectionString("UseSQLiteConnection"));
+                });
+            }
+            else
+            {
+                // Adding SQLServer DbContext service
+                services.AddDbContext<ApplicationDbContext>(options =>
+                {
+                    options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"),
+                        b => b.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName));
+                });
+            }
 
             services.AddScoped<IApplicationDbContext>(provider => provider.GetService<ApplicationDbContext>());
 

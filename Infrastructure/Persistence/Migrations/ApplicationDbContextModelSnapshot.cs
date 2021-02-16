@@ -23,7 +23,9 @@ namespace Infrastructure.Persistence.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<decimal>("Cash")
-                        .HasColumnType("TEXT");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("money")
+                        .HasDefaultValueSql("((0))");
 
                     b.Property<string>("UserId")
                         .HasColumnType("TEXT");
@@ -115,7 +117,9 @@ namespace Infrastructure.Persistence.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<decimal>("SharePrice")
-                        .HasColumnType("TEXT");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("money")
+                        .HasDefaultValueSql("((0))");
 
                     b.Property<long>("TimeStamp")
                         .HasColumnType("INTEGER");
