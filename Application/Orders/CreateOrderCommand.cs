@@ -78,6 +78,7 @@ namespace Application.Orders
             var account = await _context.Accounts
                 .Include(x => x.Orders)
                 .Include(x => x.Stocks)
+                .Include(x => x.User)
                 .FirstOrDefaultAsync(x => x.Id == request.AccountId);            
 
             if (account == null)
