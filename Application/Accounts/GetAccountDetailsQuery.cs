@@ -34,6 +34,7 @@ namespace Application.Accounts
             var account = await _context.Accounts
                 .Include(x => x.Stocks)
                 .Include(x => x.Orders)
+                .Include(x => x.User)
                 .Where(x => x.Id == request.AccountId)
                 .SingleOrDefaultAsync();
 
