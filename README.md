@@ -34,6 +34,8 @@ For example, to add a new migration from the root folder:
  
  `dotnet ef database update`
 
+ **Important!** It needs to remove all migrations when changing a database service.
+
 Also, when the application is run for the first time it builds an automatic migration populating 2 test users:
 * **Email**: jose@test.com, **Password**: Pa$$w0rd1
 * **Email**: maria@test.com, **Password**: Pa$$w0rd1
