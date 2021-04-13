@@ -1,0 +1,9 @@
+version: '3.4'
+
+services:
+  api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=server=sqldbService;Database=brockeragefirm;User Id=sa;Password=Passw0rd(!)
+    ports:
+      - "5200:80"
