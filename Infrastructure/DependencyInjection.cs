@@ -6,6 +6,7 @@ using Infrastructure.Security;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -29,9 +30,15 @@ namespace Infrastructure
             else
             {
                 // Adding SQLServer DbContext service
+                var connectionStringBuilder = new SqlConnectionStringBuilder(configuration.GetConnectionString("DefaultConnection"))
+                {
+                    UserID = configuration["DbUser"],
+                    Password = configuration["DbPassord"]
+                };
+
                 services.AddDbContext<ApplicationDbContext>(options =>
                 {
-                    options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"),
+                    options.UseSqlServer(connectionStringBuilder.ConnectionString,
                         b => b.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName));
                 });
             }
