@@ -38,11 +38,7 @@ namespace Infrastructure
 
                 services.AddDbContext<ApplicationDbContext>(options =>
                 {
-                    options.UseSqlServer(connectionStringBuilder.ConnectionString,
-                        builder => {
-                            builder.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName);
-                            builder.EnableRetryOnFailure();
-                        });
+                    options.UseSqlServer(connectionStringBuilder.ConnectionString);
                 });
             }
 

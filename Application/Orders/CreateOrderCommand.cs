@@ -60,13 +60,14 @@ namespace Application.Orders
     {
         private readonly IApplicationDbContext _context;
         private readonly IMapper _mapper;
-        private readonly IOptions<MarketSettings> _marketSettings;
+       // private readonly IOptions<MarketSettings> _marketSettings;
 
-        public Handler(IApplicationDbContext context, IMapper mapper, IOptions<MarketSettings> marketSettings)
+        public Handler(IApplicationDbContext context, IMapper mapper) 
+            //, IOptions<MarketSettings> marketSettings)
         {
             _mapper = mapper;
             _context = context;
-            _marketSettings = marketSettings;
+           // _marketSettings = marketSettings;
         }
 
         public async Task<OrderResult> Handle(CreateOrderCommand request, CancellationToken cancellationToken)
@@ -174,8 +175,9 @@ namespace Application.Orders
             if (BusinessRulesValidator.Duplicated(account, order))
                 errors.Add("DUPLICATED_OPERATION");
 
-            if (!BusinessRulesValidator.MarketIsOpen(_marketSettings.Value.TimeOpen, _marketSettings.Value.TimeClose))
-                errors.Add("CLOSED_MARKET");
+            //if (!BusinessRulesValidator.MarketIsOpen(_marketSettings.Value.TimeOpen, _marketSettings.Value.TimeClose))
+            if (!BusinessRulesValidator.MarketIsOpen(new TimeSpan(8, 0, 0), new TimeSpan(20, 0, 0)))
+                    errors.Add("CLOSED_MARKET");
 
             return errors;
         }

@@ -17,7 +17,7 @@ namespace Infrastructure.Identity
 
         public JwtGenerator(IConfiguration configuration)
         {
-            _key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Token:Key"]));
+            _key = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(configuration["Token:Key"]));
             _expiration = Convert.ToInt32(configuration["Token:ExpireHours"]);
         }
 
