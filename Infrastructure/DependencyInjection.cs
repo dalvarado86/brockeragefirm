@@ -33,13 +33,16 @@ namespace Infrastructure
                 var connectionStringBuilder = new SqlConnectionStringBuilder(configuration.GetConnectionString("DefaultConnection"))
                 {
                     UserID = configuration["DbUser"],
-                    Password = configuration["DbPassord"]
+                    Password = configuration["DbPassword"]
                 };
 
                 services.AddDbContext<ApplicationDbContext>(options =>
                 {
                     options.UseSqlServer(connectionStringBuilder.ConnectionString,
-                        b => b.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName));
+                        builder => {
+                            builder.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName);
+                            builder.EnableRetryOnFailure();
+                        });
                 });
             }
 
