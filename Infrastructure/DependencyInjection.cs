@@ -6,7 +6,6 @@ using Infrastructure.Security;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,28 +18,11 @@ namespace Infrastructure
     {
         public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
         {
-            if (configuration.GetValue<bool>("UseSQLite"))
+            //Adding DbContext service
+            services.AddDbContext<ApplicationDbContext>(options =>
             {
-                // Adding SQLite DbContext service
-                services.AddDbContext<ApplicationDbContext>(options =>
-                {
-                    options.UseSqlite(configuration.GetConnectionString("UseSQLiteConnection"));
-                });
-            }
-            else
-            {
-                // Adding SQLServer DbContext service
-                var connectionStringBuilder = new SqlConnectionStringBuilder(configuration.GetConnectionString("DefaultConnection"))
-                {
-                    UserID = configuration["DbUser"],
-                    Password = configuration["DbPassword"]
-                };
-
-                services.AddDbContext<ApplicationDbContext>(options =>
-                {
-                    options.UseSqlServer(connectionStringBuilder.ConnectionString);
-                });
-            }
+                options.UseNpgsql(configuration.GetConnectionString("DefaultConnection"));
+            });
 
             services.AddScoped<IApplicationDbContext>(provider => provider.GetService<ApplicationDbContext>());
 
