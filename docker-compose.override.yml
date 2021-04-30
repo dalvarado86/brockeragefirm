@@ -4,6 +4,6 @@ services:
   brockeragefirm-api:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=server=sqldbService;Database=brockeragefirm;User Id=sa;Password=Passw0rd(!)
+      - ConnectionStrings__DefaultConnection=Server=brockeragefirm-db;Port=5432;Database=brokeragefirm;Username=postgres;Password=Passw0rd123
     ports:
-      - "5200:80"
+      - "8080:80"
