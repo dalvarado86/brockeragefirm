@@ -1,19 +1,38 @@
 version: '3.4'
 
+networks:
+  brockeragefirm-network:
+    name: brockeragefirm-network
+    driver: bridge
+
 services:
-  api:
-    image: ${DOCKER_REGISTRY-}api
+  brockeragefirm-api:
+    container_name: brockeragefirm-api
     build:
       context: .
       dockerfile: API/Dockerfile
-    depends_on:
-      - sqldbService
-
-  sqldbService:
-    image: mcr.microsoft.com/mssql/server:2019-latest
-    container_name: sqlserver
-    environment:
-      ACCEPT_EULA: 'Y'
-      SA_PASSWORD: "Passw0rd(!)"
+    restart: always
+    networks:
+        - brockeragefirm-network
     ports:
-      - "1403:1433" 
+      - 8080:80
+    depends_on:
+      - brockeragefirm-db
+
+  brockeragefirm-db:    
+    container_name: brockeragefirm-db
+    image: postgres:latest
+    networks:
+      - brockeragefirm-network
+    ports:
+      - 5432:5432 
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: Passw0rd123
+      POSTGRES_DB: brokeragefirm      
+    volumes:
+       - brockeragefirm-postgres-data:/var/lib/postgres   
+
+volumes:
+  brockeragefirm-postgres-data:

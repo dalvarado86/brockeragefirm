@@ -1,7 +1,7 @@
 version: '3.4'
 
 services:
-  api:
+  brockeragefirm-api:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=server=sqldbService;Database=brockeragefirm;User Id=sa;Password=Passw0rd(!)

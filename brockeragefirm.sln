@@ -19,6 +19,12 @@ Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-co
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServerlessAPI", "ServerlessAPI\ServerlessAPI.csproj", "{198019B9-7866-4907-B5EC-0CB9F7E72211}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "k8s", "k8s", "{7D97577B-6DC2-4BC1-9F82-4C77B7FBF016}"
+	ProjectSection(SolutionItems) = preProject
+		brockeragefirm-api-deployment.yaml = brockeragefirm-api-deployment.yaml
+		brockeragefirm-db-deployment.yaml = brockeragefirm-db-deployment.yaml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

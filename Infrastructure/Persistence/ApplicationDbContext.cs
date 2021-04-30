@@ -2,6 +2,8 @@
 using Domain.Entities;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Polly;
+using System;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
@@ -29,6 +31,14 @@ namespace Infrastructure.Persistence
         {
             builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
             base.OnModelCreating(builder);
+        }
+
+        public void MigrateDB()
+        {
+            Policy
+                .Handle<Exception>()
+                .WaitAndRetry(10, r => TimeSpan.FromSeconds(10))
+                .Execute(() => Database.Migrate());
         }
     }
 }
