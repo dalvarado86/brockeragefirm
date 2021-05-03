@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: brockeragefirm-api
+  labels:
+    app: brockeragefirm-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: brockeragefirm-api
+  template:
+    metadata:
+      labels:
+        app: brockeragefirm-api
+    spec:
+      containers:
+        - name: brockeragefirm-api
+          image: brockeragefirm_brockeragefirm-api
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 80
+          resources:
+            requests:
+              cpu: 100m
+              memory: 100Mi
+            limits:
+              cpu: 200m
+              memory: 200Mi
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: brockeragefirm-api-service
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 80
+  selector:
+    app: brockeragefirm-api
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: brockeragefirm-api-ingress
+  labels:
+    app: brockeragefirm-api-ingress
+spec: 
+  rules:
+    - http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service: 
+                name: brockeragefirm-api-service
+                port:
+                  number: 80
