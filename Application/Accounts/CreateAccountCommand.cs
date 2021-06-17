@@ -35,26 +35,27 @@ namespace Application.Accounts
         private readonly IApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IUserAccessor _userAccessor;
-        //private readonly IOptions<MarketSettings> _marketSettings;
+        private readonly IOptions<MarketSettings> _marketSettings;
 
         public Handler(IApplicationDbContext context, 
             UserManager<ApplicationUser> userManager, 
-            IUserAccessor userAccessor
-            )//, IOptions<MarketSettings> marketSettings)
+            IUserAccessor userAccessor,
+            IOptions<MarketSettings> marketSettings)
         {
             _context = context;
             _userManager = userManager;
             _userAccessor = userAccessor;
-            //_marketSettings = marketSettings;
+            _marketSettings = marketSettings;
         }
 
         public async Task<AccountResult> Handle(CreateAccountCommand request, CancellationToken cancellationToken)
         {
             var user = await _userManager.FindByNameAsync(_userAccessor.GetCurrentUsername());
 
-            //if (!BusinessRulesValidator.MarketIsOpen(_marketSettings.Value.TimeOpen, _marketSettings.Value.TimeClose))
-            if (!BusinessRulesValidator.MarketIsOpen(new TimeSpan(8,0,0), new TimeSpan(20, 0, 0)))
-                    throw new RestException(HttpStatusCode.BadRequest, new { Account = "Market is closed" });
+            if (!BusinessRulesValidator.MarketIsOpen(_marketSettings.Value.TimeOpen, _marketSettings.Value.TimeClose))
+            {
+                throw new RestException(HttpStatusCode.BadRequest, new { Account = "Market is closed" });
+            }
 
             var account = new Account
             {
@@ -67,11 +68,13 @@ namespace Application.Accounts
             var success = await _context.SaveChangesAsync(cancellationToken) > 0;
 
             if (success)
+            {
                 return new AccountResult
                 {
                     Id = account.Id,
                     Cash = account.Cash
                 };
+            }
 
             throw new Exception("There are a problem saving changes");
         }
