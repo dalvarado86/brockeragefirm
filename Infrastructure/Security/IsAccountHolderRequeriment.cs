@@ -24,7 +24,7 @@ namespace Infrastructure.Security
             _context = context;
         }
 
-        protected override Task HandleRequirementAsync(AuthorizationHandlerContext authContext, IsAccountHolderRequeriment requirement)
+        protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, IsAccountHolderRequeriment requirement)
         {
             var httpContext = _httpContextAccessor.HttpContext;
 
@@ -39,13 +39,13 @@ namespace Infrastructure.Security
                     .SingleOrDefaultAsync(x => x.Id == accountId).Result;
 
                 if (account.User.UserName == currentUserName)
-                    authContext.Succeed(requirement);
+                    context.Succeed(requirement);
                 else
-                    authContext.Fail();
+                    context.Fail();
             }
             else
             {
-                authContext.Fail();
+                context.Fail();
             }
 
             return Task.CompletedTask;

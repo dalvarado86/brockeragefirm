@@ -14,8 +14,7 @@ namespace Application.Common.Validators
         public static bool SufficentStocks(Account account, Order order)
         {
             return account.Stocks
-                .Where(x => x.IssuerName == order.IssuerName)
-                .SingleOrDefault()?.Quantity >= order.TotalShares;
+                .SingleOrDefault(x => x.IssuerName == order.IssuerName)?.Quantity >= order.TotalShares;
         }
 
         public static bool Duplicated(Account account, Order order)

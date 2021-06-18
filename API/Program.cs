@@ -13,6 +13,10 @@ namespace API
 {
     public class Program
     {
+        protected Program()
+        {
+        }
+
         public static void Main(string[] args)
         {
             var host = CreateHostBuilder(args).Build();
@@ -25,7 +29,6 @@ namespace API
                 {
                     var context = services.GetRequiredService<ApplicationDbContext>();
                     var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
-                    //context.Database.Migrate();                    
                     scope.ServiceProvider.GetService<ApplicationDbContext>().MigrateDB();
                     Seed.SeedData(context, userManager).Wait();
                 }

@@ -5,7 +5,6 @@ using Domain.Entities;
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
-using System;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
@@ -66,7 +65,7 @@ namespace Application.Users
                 };
             }
 
-            throw new Exception("Problem creating user");
+            throw new ApplicationException("Problem creating user");
         }
     }
 }

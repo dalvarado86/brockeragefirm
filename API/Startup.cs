@@ -76,15 +76,11 @@ namespace API
             // Using an ErrorHandlingMiddleware instead of Exception Page in Development and Production environments
             app.UseMiddleware<ErrorHandlingMiddleware>();
 
-            //JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
-
             if (env.IsDevelopment())
             {
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "API v1"));
             }
-
-            //app.UseHttpsRedirection();
 
             app.UseRouting();
 

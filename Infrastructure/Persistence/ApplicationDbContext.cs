@@ -37,7 +37,7 @@ namespace Infrastructure.Persistence
         {
             Policy
                 .Handle<Exception>()
-                .WaitAndRetry(10, r => TimeSpan.FromSeconds(10))
+                .WaitAndRetry(5, r => TimeSpan.FromSeconds(10))
                 .Execute(() => Database.Migrate());
         }
     }

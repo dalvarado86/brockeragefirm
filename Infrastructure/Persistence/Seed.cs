@@ -9,6 +9,10 @@ namespace Infrastructure.Persistence
 {
     public class Seed
     {
+        protected Seed()
+        {
+        }
+
         public static async Task SeedData(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
         {
             // Seeding test users

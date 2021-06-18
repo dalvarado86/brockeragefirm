@@ -76,7 +76,7 @@ namespace Application.Accounts
                 };
             }
 
-            throw new Exception("There are a problem saving changes");
+            throw new Common.Exceptions.ApplicationException("There are a problem saving changes");
         }
     }
 }

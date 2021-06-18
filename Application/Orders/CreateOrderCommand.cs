@@ -60,21 +60,17 @@ namespace Application.Orders
     {
         private readonly IApplicationDbContext _context;
         private readonly IMapper _mapper;
-       // private readonly IOptions<MarketSettings> _marketSettings;
+       private readonly IOptions<MarketSettings> _marketSettings;
 
-        public Handler(IApplicationDbContext context, IMapper mapper) 
-            //, IOptions<MarketSettings> marketSettings)
+        public Handler(IApplicationDbContext context, IMapper mapper, IOptions<MarketSettings> marketSettings)
         {
             _mapper = mapper;
             _context = context;
-           // _marketSettings = marketSettings;
+            _marketSettings = marketSettings;
         }
 
         public async Task<OrderResult> Handle(CreateOrderCommand request, CancellationToken cancellationToken)
         {
-            var businessErrors = new List<string>();
-            var issuers = new List<IssuerDto>();
-
             // Getting the account
             var account = await _context.Accounts
                 .Include(x => x.Orders)
@@ -99,7 +95,7 @@ namespace Application.Orders
             var grandTotal = request.SharePrice * request.TotalShares;
 
             // Validating business rules
-            businessErrors = Validations(account, order);
+            var businessErrors = Validations(account, order);
                           
             if (businessErrors.Count == 0)
             {
@@ -108,15 +104,14 @@ namespace Application.Orders
 
                 // Getting the specific stock from the account
                 var stock = account.Stocks
-                    .Where(x => x.IssuerName == order.IssuerName)
-                    .SingleOrDefault();
+                    .SingleOrDefault(x => x.IssuerName == order.IssuerName);
 
                 if (stock != null)
                 {
                     // Updating the current stock
-                    stock.Quantity = string.Equals(request.Operation, "BUY") ?
-                        stock.Quantity += request.TotalShares : // Adding to the stock if is buy
-                        stock.Quantity -= request.TotalShares;  // Removing to the stock if is sell
+                    stock.Quantity = string.Equals(request.Operation, "BUY") 
+                        ? stock.Quantity += request.TotalShares // Adding to the stock if is buy
+                        : stock.Quantity -= request.TotalShares; // Removing to the stock if is sell
                 }
                 else
                 {
@@ -131,15 +126,17 @@ namespace Application.Orders
                 }
               
                 // Updating account's balance
-                account.Cash = string.Equals(request.Operation, "SELL") ?
-                                   account.Cash += grandTotal :
-                                           account.Cash -= grandTotal;
+                account.Cash = string.Equals(request.Operation, "SELL") 
+                    ? account.Cash += grandTotal 
+                    : account.Cash -= grandTotal;
                
                 // Saving changes
                 var success = await _context.SaveChangesAsync(cancellationToken) > 0;
 
                 if (!success)
-                    throw new Exception("Problem saving changes");                
+                {
+                    throw new Common.Exceptions.ApplicationException("Problem saving changes");
+                }
             }
 
             return new OrderResult
@@ -171,13 +168,16 @@ namespace Application.Orders
                     errors.Add("INVALID_OPERATION");
                     break;
             }
-         
-            if (BusinessRulesValidator.Duplicated(account, order))
-                errors.Add("DUPLICATED_OPERATION");
 
-            //if (!BusinessRulesValidator.MarketIsOpen(_marketSettings.Value.TimeOpen, _marketSettings.Value.TimeClose))
-            if (!BusinessRulesValidator.MarketIsOpen(new TimeSpan(8, 0, 0), new TimeSpan(20, 0, 0)))
-                    errors.Add("CLOSED_MARKET");
+            if (BusinessRulesValidator.Duplicated(account, order))
+            {
+                errors.Add("DUPLICATED_OPERATION");
+            }
+
+            if (!BusinessRulesValidator.MarketIsOpen(_marketSettings.Value.TimeOpen, _marketSettings.Value.TimeClose))
+            {
+                errors.Add("CLOSED_MARKET");
+            }
 
             return errors;
         }
