@@ -25,16 +25,18 @@ namespace API
             using (var scope = host.Services.CreateScope())
             {
                 var services = scope.ServiceProvider;
+                var logger = services.GetRequiredService<ILogger<Program>>();
+
                 try
                 {
                     var context = services.GetRequiredService<ApplicationDbContext>();
                     var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
                     scope.ServiceProvider.GetService<ApplicationDbContext>().MigrateDB();
+                    logger.LogInformation("Seeding data.");
                     Seed.SeedData(context, userManager).Wait();
                 }
                 catch (Exception ex)
-                {
-                    var logger = services.GetRequiredService<ILogger<Program>>();
+                {                   
                     logger.LogError(ex, "An error occured during migration");
                 }
             }

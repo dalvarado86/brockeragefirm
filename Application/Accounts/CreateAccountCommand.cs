@@ -7,8 +7,8 @@ using Domain.Entities;
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using System;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
@@ -36,33 +36,39 @@ namespace Application.Accounts
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IUserAccessor _userAccessor;
         private readonly IOptions<MarketSettings> _marketSettings;
+        private readonly ILogger<Handler> _logger;
 
         public Handler(IApplicationDbContext context, 
             UserManager<ApplicationUser> userManager, 
             IUserAccessor userAccessor,
-            IOptions<MarketSettings> marketSettings)
+            IOptions<MarketSettings> marketSettings,
+            ILogger<Handler> logger)
         {
             _context = context;
             _userManager = userManager;
             _userAccessor = userAccessor;
             _marketSettings = marketSettings;
+            _logger = logger;
         }
 
         public async Task<AccountResult> Handle(CreateAccountCommand request, CancellationToken cancellationToken)
-        {
-            var user = await _userManager.FindByNameAsync(_userAccessor.GetCurrentUsername());
-
+        {           
             if (!BusinessRulesValidator.MarketIsOpen(_marketSettings.Value.TimeOpen, _marketSettings.Value.TimeClose))
             {
+                _logger.LogInformation("Market is closed");
                 throw new RestException(HttpStatusCode.BadRequest, new { Account = "Market is closed" });
             }
+
+            _logger.LogInformation("Get current username.");
+            var user = await _userManager.FindByNameAsync(_userAccessor.GetCurrentUsername());
 
             var account = new Account
             {
                 Cash = request.Cash,
                 User = user
-            };         
+            };
 
+            _logger.LogInformation($"Create new account: UserId {account.User.Id}, Amount: {account.Cash}");
             account = _context.Accounts.Add(account).Entity;
 
             var success = await _context.SaveChangesAsync(cancellationToken) > 0;
@@ -76,7 +82,8 @@ namespace Application.Accounts
                 };
             }
 
-            throw new Common.Exceptions.ApplicationException("There are a problem saving changes");
+            _logger.LogError("There are a problem creating the account", nameof(request));
+            throw new Common.Exceptions.ApplicationException("There are a problem creating the account");
         }
     }
 }
