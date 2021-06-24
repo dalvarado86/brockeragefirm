@@ -11,14 +11,30 @@ using System.Threading.Tasks;
 
 namespace Application.Users
 {
+    /// <summary>
+    /// LoginQuery.
+    /// </summary>
     public class LoginQuery : IRequest<UserResult>
     {
+        /// <summary>
+        /// Gets or sets the email.
+        /// </summary>
         public string Email { get; set; }
+
+        /// <summary>
+        /// Gets or sets the password.
+        /// </summary>
         public string Password { get; set; }
     }
 
+    /// <summary>
+    /// LoginQueryValidator.
+    /// </summary>
     public class LoginQueryValidator : AbstractValidator<LoginQuery>
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="LoginQueryValidator"/> class.
+        /// </summary>
         public LoginQueryValidator()
         {
             RuleFor(x => x.Email).NotEmpty();
@@ -26,6 +42,9 @@ namespace Application.Users
         }
     }
 
+    /// <summary>
+    /// LoginHandler.
+    /// </summary>
     public class LoginHandler : IRequestHandler<LoginQuery, UserResult>
     {
         private readonly UserManager<ApplicationUser> _userManager;
@@ -33,6 +52,13 @@ namespace Application.Users
         private readonly IJwtGenerator _jwtGenerator;
         private readonly ILogger<LoginHandler> _logger;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="LoginHandler"/> class.
+        /// </summary>
+        /// <param name="userManager">The user manager.</param>
+        /// <param name="signInManager">The signin manager.</param>
+        /// <param name="jwtGenerator">The jwt generator.</param>
+        /// <param name="logger">The logger.</param>
         public LoginHandler(
             UserManager<ApplicationUser> userManager, 
             SignInManager<ApplicationUser> signInManager, 
@@ -45,6 +71,7 @@ namespace Application.Users
             _logger = logger;
         }
 
+        /// <inheritdoc/>
         public async Task<UserResult> Handle(LoginQuery request, CancellationToken cancellationToken)
         {
             _logger.LogInformation($"Get user by email '{request.Email}'");

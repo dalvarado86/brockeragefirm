@@ -4,8 +4,19 @@ using System.Linq;
 
 namespace Application.Common.Validators
 {
+    /// <summary>
+    /// ValidatorExtensions.
+    /// </summary>
     public static class ValidatorExtensions
     {
+        /// <summary>
+        /// Applies a set of rules to validate an object instance.
+        /// </summary>
+        /// <typeparam name="T">The type of <c>T</c></typeparam>
+        /// <typeparam name="TProperty">The TProperty.</typeparam>
+        /// <param name="ruleBuilder">The rule builder.</param>
+        /// <param name="validOptions">The valid options.</param>
+        /// <returns>The <see cref="IRuleBuilderOptions{T, TProperty}"/>.</returns>
         public static IRuleBuilderOptions<T, TProperty> In<T, TProperty>(this IRuleBuilder<T, TProperty> ruleBuilder, params TProperty[] validOptions)
         {
             string formatted;
@@ -26,6 +37,12 @@ namespace Application.Common.Validators
                 .Must(validOptions.Contains).WithMessage($"{{PropertyName}} must be: {formatted}");
         }
 
+        /// <summary>
+        /// Validates password.
+        /// </summary>
+        /// <typeparam name="T">The type of T</typeparam>
+        /// <param name="ruleBuilder">The rule builder</param>
+        /// <returns>The <see cref="IRuleBuilderOptions{T, string}"/>.</returns>
         public static IRuleBuilder<T, string> Password<T>(this IRuleBuilder<T, string> ruleBuilder)
         {
             var options = ruleBuilder

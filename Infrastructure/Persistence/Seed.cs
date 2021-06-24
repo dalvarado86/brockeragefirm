@@ -7,12 +7,24 @@ using System.Threading.Tasks;
 
 namespace Infrastructure.Persistence
 {
+    /// <summary>
+    /// Seed.
+    /// </summary>
     public class Seed
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Seed"/> class.
+        /// </summary>
         protected Seed()
         {
         }
 
+        /// <summary>
+        /// Seeds the initial data.
+        /// </summary>
+        /// <param name="context">The database context.</param>
+        /// <param name="userManager">The user manager.</param>
+        /// <returns></returns>
         public static async Task SeedData(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
         {
             // Seeding test users

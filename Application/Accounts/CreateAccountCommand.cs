@@ -15,13 +15,25 @@ using System.Threading.Tasks;
 
 namespace Application.Accounts
 {
+    /// <summary>
+    /// CreateAccountCommand.
+    /// </summary>
     public class CreateAccountCommand : IRequest<AccountResult>
     {
+        /// <summary>
+        /// Gets or sets the cash amount.
+        /// </summary>
         public decimal Cash { get; set; }
     }
 
+    /// <summary>
+    /// CommandValidator.
+    /// </summary>
     public class CommandValidator : AbstractValidator<CreateAccountCommand>
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CommandValidator"/> class.
+        /// </summary>
         public CommandValidator()
         {
             RuleFor(x => x.Cash)
@@ -30,6 +42,9 @@ namespace Application.Accounts
         }
     }
 
+    /// <summary>
+    /// Handler.
+    /// </summary>
     public class Handler : IRequestHandler<CreateAccountCommand, AccountResult>
     {
         private readonly IApplicationDbContext _context;
@@ -38,6 +53,14 @@ namespace Application.Accounts
         private readonly IOptions<MarketSettings> _marketSettings;
         private readonly ILogger<Handler> _logger;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Handler"/> class.
+        /// </summary>
+        /// <param name="context">The context.</param>
+        /// <param name="userManager">The user manager.</param>
+        /// <param name="userAccessor">The user accesor.</param>
+        /// <param name="marketSettings">The market settings</param>
+        /// <param name="logger">The logger.</param>
         public Handler(IApplicationDbContext context, 
             UserManager<ApplicationUser> userManager, 
             IUserAccessor userAccessor,
@@ -51,6 +74,7 @@ namespace Application.Accounts
             _logger = logger;
         }
 
+        /// <inheritdoc/>
         public async Task<AccountResult> Handle(CreateAccountCommand request, CancellationToken cancellationToken)
         {           
             if (!BusinessRulesValidator.MarketIsOpen(_marketSettings.Value.TimeOpen, _marketSettings.Value.TimeClose))

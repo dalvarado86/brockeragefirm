@@ -10,17 +10,25 @@ using System.Text;
 
 namespace Infrastructure.Identity
 {
+    /// <summary>
+    /// JwtGenerator.
+    /// </summary>
     public class JwtGenerator : IJwtGenerator
     {
         private readonly int _expiration;
         private readonly SymmetricSecurityKey _key;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="JwtGenerator"/> class.
+        /// </summary>
+        /// <param name="configuration">The configuration.</param>
         public JwtGenerator(IConfiguration configuration)
         {
             _key = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(configuration["Token:Key"]));
             _expiration = Convert.ToInt32(configuration["Token:ExpireHours"]);
         }
 
+        /// <inheritdoc/>
         public string CreateToken(ApplicationUser user)
         {
             var claims = new List<Claim>

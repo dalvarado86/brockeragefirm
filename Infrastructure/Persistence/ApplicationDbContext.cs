@@ -10,17 +10,30 @@ using System.Threading.Tasks;
 
 namespace Infrastructure.Persistence
 {
+    /// <summary>
+    /// ApplicationDbContext.
+    /// </summary>
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplicationDbContext
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ApplicationDbContext"/> class.
+        /// </summary>
+        /// <param name="options">The database context options.</param>
         public ApplicationDbContext(DbContextOptions options) : base(options)
         {
 
         }
-
+        
+        /// <inheritdoc/>
         public DbSet<Account> Accounts { get; set; }
+
+        /// <inheritdoc/>
         public DbSet<Order> Orders { get; set; }
+
+        /// <inheritdoc/>
         public DbSet<Stock> Stocks { get; set; }
 
+        /// <inheritdoc/>
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
         {
             var result = await base.SaveChangesAsync(cancellationToken);
@@ -33,6 +46,9 @@ namespace Infrastructure.Persistence
             base.OnModelCreating(builder);
         }
 
+        /// <summary>
+        /// Starts a migration of the database for the first time.
+        /// </summary>
         public void MigrateDB()
         {
             Policy

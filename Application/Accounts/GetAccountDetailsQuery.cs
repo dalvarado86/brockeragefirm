@@ -14,17 +14,29 @@ using System.Threading.Tasks;
 
 namespace Application.Accounts
 {
+    /// <summary>
+    /// GetAccountDetailsQuery.
+    /// </summary>
     public class GetAccountDetailsQuery : IRequest<AccountDetailsDto>
     {
         public int AccountId { get; set; }
     }
 
+    /// <summary>
+    /// GetStocksByAccountQueryHandler.
+    /// </summary>
     public class GetStocksByAccountQueryHandler : IRequestHandler<GetAccountDetailsQuery, AccountDetailsDto>
     {
         private readonly IApplicationDbContext _context;
         private readonly IMapper _mapper;
         private readonly ILogger<GetStocksByAccountQueryHandler> _logger;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="GetStocksByAccountQueryHandler"/> class.
+        /// </summary>
+        /// <param name="context">The context.</param>
+        /// <param name="mapper">The mapper.</param>
+        /// <param name="logger">The logger.</param>
         public GetStocksByAccountQueryHandler(
             IApplicationDbContext context, 
             IMapper mapper, 
@@ -35,6 +47,7 @@ namespace Application.Accounts
             _logger = logger;
         }
 
+        /// <inheritdoc/>
         public async Task<AccountDetailsDto> Handle(GetAccountDetailsQuery request, CancellationToken cancellationToken)
         {            
             var account = await _context.Accounts

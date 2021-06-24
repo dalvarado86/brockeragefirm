@@ -5,8 +5,14 @@ using Domain.Entities;
 
 namespace Application.Mappings
 {
+    /// <summary>
+    /// MappingProfile.
+    /// </summary>
     public class MappingProfile : Profile
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MappingProfile"/> class.
+        /// </summary>
         public MappingProfile()
         {
             CreateMap<Order, IssuerDto>()

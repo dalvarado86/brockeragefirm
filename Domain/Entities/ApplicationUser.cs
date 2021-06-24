@@ -2,6 +2,9 @@
 
 namespace Domain.Entities
 {
+    /// <summary>
+    /// ApplicationUser.
+    /// </summary>
     public class ApplicationUser : IdentityUser
     {     
     }

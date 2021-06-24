@@ -20,25 +20,54 @@ using System.Threading.Tasks;
 
 namespace Application.Orders
 {
+    /// <summary>
+    /// CreateOrderCommand
+    /// </summary>
     public class CreateOrderCommand : IRequest<OrderResult>
     {
+        /// <summary>
+        /// Gets or sets the account identifier.
+        /// </summary>
         [JsonIgnore]
         public int AccountId { get; set; }
+
+        /// <summary>
+        /// Gets or sets the timestamp.
+        /// </summary>
         public long Timestamp { get; set; }
+
+        /// <summary>
+        /// Gets or sets the operation.
+        /// </summary>
         public string Operation { get; set; }   
         
+        /// <summary>
+        /// Gets or sets the issuer name.
+        /// </summary>
         [JsonPropertyName("issuer_name")]
         public string IssuerName { get; set; }
 
+        /// <summary>
+        /// Gets or sets the total shares.
+        /// </summary>
         [JsonPropertyName("total_shares")]
         public int TotalShares { get; set; }
 
+        /// <summary>
+        /// Gets or sets the share price.
+        /// </summary>
         [JsonPropertyName("share_price")]
         public decimal SharePrice { get; set; }
     }
 
+    /// <summary>
+    /// CommandValidator
+    /// </summary>
     public class CommandValidator : AbstractValidator<CreateOrderCommand>
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CommandValidator"/> class.
+        /// </summary>
         public CommandValidator()
         {
             RuleFor(x => x.Operation)
@@ -57,6 +86,9 @@ namespace Application.Orders
         }
     }
 
+    /// <summary>
+    /// Handler.
+    /// </summary>
     public class Handler : IRequestHandler<CreateOrderCommand, OrderResult>
     {
         private readonly IApplicationDbContext _context;
@@ -64,6 +96,13 @@ namespace Application.Orders
         private readonly IOptions<MarketSettings> _marketSettings;
         private readonly ILogger<Handler> _logger;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Handler"/> class.
+        /// </summary>
+        /// <param name="context">The context.</param>
+        /// <param name="mapper">The mapper.</param>
+        /// <param name="marketSettings">The market settings.</param>
+        /// <param name="logger">The logger.</param>
         public Handler(
             IApplicationDbContext context, 
             IMapper mapper, 
@@ -76,6 +115,7 @@ namespace Application.Orders
             _logger = logger;
         }
 
+        /// <inheritdoc/>
         public async Task<OrderResult> Handle(CreateOrderCommand request, CancellationToken cancellationToken)
         {
             var account = await _context.Accounts

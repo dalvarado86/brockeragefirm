@@ -14,8 +14,17 @@ using System.Text;
 
 namespace Infrastructure
 {
+    /// <summary>
+    /// DependencyInjection.
+    /// </summary>
     public static class DependencyInjection
     {
+        /// <summary>
+        /// Adds the infrastructure services.
+        /// </summary>
+        /// <param name="services">The services.</param>
+        /// <param name="configuration">The configuration.</param>
+        /// <returns></returns>
         public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
         {
             //Adding DbContext service

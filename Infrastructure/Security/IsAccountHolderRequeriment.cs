@@ -9,21 +9,33 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Security
 {
+    /// <summary>
+    /// IsAccountHolderRequeriment.
+    /// </summary>
     public class IsAccountHolderRequeriment : IAuthorizationRequirement
     {
     }
 
+    /// <summary>
+    /// IsAccountHolderRequerimentHandler.
+    /// </summary>
     public class IsAccountHolderRequerimentHandler : AuthorizationHandler<IsAccountHolderRequeriment>
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ApplicationDbContext _context;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="IsAccountHolderRequerimentHandler"/> class.
+        /// </summary>
+        /// <param name="httpContextAccessor">The httpContextAccessor.</param>
+        /// <param name="context">The database context.</param>
         public IsAccountHolderRequerimentHandler(IHttpContextAccessor httpContextAccessor, ApplicationDbContext context)
         {
             _httpContextAccessor = httpContextAccessor;
             _context = context;
         }
 
+        /// <inheritdoc/>
         protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, IsAccountHolderRequeriment requirement)
         {
             var httpContext = _httpContextAccessor.HttpContext;

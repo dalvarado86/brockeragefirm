@@ -8,10 +8,16 @@ using System.Threading.Tasks;
 
 namespace Application.Users
 {
+    /// <summary>
+    /// CurrentUserQuery.
+    /// </summary>
     public class CurrentUserQuery : IRequest<UserResult>
     {
     }
 
+    /// <summary>
+    /// CurrentUserHandler.
+    /// </summary>
     public class CurrentUserHandler : IRequestHandler<CurrentUserQuery, UserResult>
     {
         private readonly IJwtGenerator _jwtGenerator;
@@ -19,6 +25,13 @@ namespace Application.Users
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ILogger<CurrentUserHandler> _logger;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CurrentUserHandler"/> class.
+        /// </summary>
+        /// <param name="userManager">The user manager.</param>
+        /// <param name="jwtGenerator">The jwt generator.</param>
+        /// <param name="userAccessor">The user accessor.</param>
+        /// <param name="logger">The logger.</param>
         public CurrentUserHandler(
             UserManager<ApplicationUser> userManager, 
             IJwtGenerator jwtGenerator, 
@@ -31,6 +44,7 @@ namespace Application.Users
             _logger = logger;
         }
 
+        /// <inheritdoc/>
         public async Task<UserResult> Handle(CurrentUserQuery request, CancellationToken cancellationToken)
         {
             var user = await _userManager.FindByNameAsync(_userAccessor.GetCurrentUsername());

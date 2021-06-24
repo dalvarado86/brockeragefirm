@@ -12,15 +12,35 @@ using System.Threading.Tasks;
 
 namespace Application.Users
 {
+    /// <summary>
+    /// RegisterUserCommand.
+    /// </summary>
     public class RegisterUserCommand : IRequest<UserResult>
     {
+        /// <summary>
+        /// Gets or sets the username.
+        /// </summary>
         public string UserName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the email.
+        /// </summary>
         public string Email { get; set; }
+
+        /// <summary>
+        /// Gets or sets the password.
+        /// </summary>
         public string Password { get; set; }
     }
 
+    /// <summary>
+    /// RegisterUserCommandValidator.
+    /// </summary>
     public class RegisterUserCommandValidator : AbstractValidator<RegisterUserCommand>
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RegisterUserCommandValidator"/> class.
+        /// </summary>
         public RegisterUserCommandValidator()
         {
             RuleFor(x => x.UserName).NotEmpty();
@@ -29,12 +49,21 @@ namespace Application.Users
         }
     }
 
+    /// <summary>
+    /// RegisterUserHandler.
+    /// </summary>
     public class RegisterUserHandler : IRequestHandler<RegisterUserCommand, UserResult>
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IJwtGenerator _jwtGenerator;
         private readonly ILogger<RegisterUserHandler> _logger;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RegisterUserHandler"/> class.
+        /// </summary>
+        /// <param name="userManager">The user manager.</param>
+        /// <param name="jwtGenerator">The jwt generator.</param>
+        /// <param name="logger">The logger.</param>
         public RegisterUserHandler(
             UserManager<ApplicationUser> userManager, 
             IJwtGenerator jwtGenerator,
@@ -45,6 +74,7 @@ namespace Application.Users
             _logger = logger;
         }
 
+        /// <inheritdoc/>
         public async Task<UserResult> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
         {
             if (await _userManager.FindByEmailAsync(request.Email) != null)

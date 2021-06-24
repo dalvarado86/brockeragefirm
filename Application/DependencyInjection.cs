@@ -7,8 +7,17 @@ using System.Reflection;
 
 namespace Application
 {
+    /// <summary>
+    /// DependencyInjection.
+    /// </summary>
     public static class DependencyInjection
     {
+        /// <summary>
+        /// Adds the application services.
+        /// </summary>
+        /// <param name="services">The services.</param>
+        /// <param name="configuration">The configuration.</param>
+        /// <returns></returns>
         public static IServiceCollection AddApplication(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddAutoMapper(Assembly.GetExecutingAssembly());
